@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDP-2026 — Mariia Prokopovych</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef1f0;
+    --paper:#ffffff;
+    --ink:#14213d;
+    --ink-soft:#5c6672;
+    --ink-faint:#8b93a0;
+    --border:#dde2e5;
+    --pass:#1f7a4c;
+    --pass-bg:#e6f4ec;
+    --prog:#a8730a;
+    --prog-bg:#faf1de;
+    --todo:#8b93a0;
+    --todo-bg:#eef0f2;
+    --accent:#2f5f8a;
+    --accent-soft:#e7eff5;
+    --high:#a3402c;
+    --high-bg:#f7e9e5;
+    --display:'Space Grotesk',sans-serif;
+    --body:'IBM Plex Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(180deg,var(--bg) 0%, var(--bg) 100%);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.5;
+    padding:0 0 80px 0;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- Header / run summary ---------- */
+  .runbar{
+    background:var(--ink);
+    color:#fff;
+    padding:34px 0 26px 0;
+    border-bottom:4px solid var(--accent);
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#9fb3d1;
+    margin:0 0 10px 0;
+  }
+  h1{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:34px;
+    margin:0 0 6px 0;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:#c3ccd9;
+    font-size:15px;
+    margin:0 0 22px 0;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 28px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:#c3ccd9;
+    margin-bottom:22px;
+  }
+  .meta-row b{color:#fff;font-weight:600;}
+
+  .runstat{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:10px;
+    padding:16px 18px;
+  }
+  .runstat .pct{
+    font-family:var(--display);
+    font-size:30px;
+    font-weight:700;
+    min-width:70px;
+  }
+  .runstat .bar-track{
+    flex:1;
+    height:10px;
+    background:rgba(255,255,255,.14);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .runstat .bar-fill{
+    height:100%;
+    background:linear-gradient(90deg,#3a7a52,#57a374);
+    width:0%;
+    transition:width .4s ease;
+  }
+  .runstat .label{font-family:var(--mono);font-size:12px;color:#c3ccd9;}
+  .target-note{
+    font-size:13px;
+    color:#c3ccd9;
+    margin-top:12px;
+  }
+  .target-note b{color:#e8c77a;}
+
+  /* ---------- Phase sections ---------- */
+  .phase{margin-top:44px;}
+  .phase-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:10px;
+    margin-bottom:18px;
+  }
+  .phase-title{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:20px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  .phase-tag{
+    font-family:var(--mono);
+    font-size:12px;
+    background:var(--ink);
+    color:#fff;
+    padding:2px 8px;
+    border-radius:4px;
+  }
+  .phase-dates{
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .phase-progress{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .mini-track{width:90px;height:6px;background:var(--todo-bg);border-radius:4px;overflow:hidden;}
+  .mini-fill{height:100%;background:var(--pass);width:0%;transition:width .4s ease;}
+  .phase-blurb{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin:-6px 0 20px 0;
+    max-width:640px;
+  }
+
+  /* ---------- Test case card ---------- */
+  .case{
+    background:var(--paper);
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .case-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 18px;
+    border-bottom:1px solid var(--border);
+    cursor:pointer;
+    user-select:none;
+  }
+  .case-head-left{display:flex;align-items:center;gap:12px;min-width:0;}
+  .case-id{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-faint);
+    white-space:nowrap;
+  }
+  .case-title{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:16px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .priority{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+  .priority.high{background:var(--high-bg);color:var(--high);}
+  .priority.medium{background:var(--prog-bg);color:var(--prog);}
+
+  .status-badge{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.06em;
+    padding:5px 10px;
+    border-radius:6px;
+    white-space:nowrap;
+  }
+  .status-badge.todo{background:var(--todo-bg);color:var(--todo);}
+  .status-badge.progress{background:var(--prog-bg);color:var(--prog);}
+  .status-badge.pass{background:var(--pass-bg);color:var(--pass);}
+
+  .chev{
+    font-size:12px;
+    color:var(--ink-faint);
+    transition:transform .2s ease;
+    flex-shrink:0;
+  }
+  .case.open .chev{transform:rotate(180deg);}
+
+  .case-body{
+    padding:0 18px 18px 18px;
+    display:none;
+  }
+  .case.open .case-body{display:block;}
+
+  .field{margin-top:14px;}
+  .field-label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:6px;
+  }
+  .precondition{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--todo-bg);
+    border-left:3px solid var(--todo);
+    padding:8px 12px;
+    border-radius:0 6px 6px 0;
+  }
+  .expected{
+    font-size:13.5px;
+    color:var(--pass);
+    background:var(--pass-bg);
+    border-left:3px solid var(--pass);
+    padding:8px 12px;
+    border-radius:0 6px 6px 0;
+  }
+  .steps{list-style:none;margin:0;padding:0;}
+  .step{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:7px 0;
+    border-bottom:1px solid #f1f2f4;
+    font-size:14px;
+  }
+  .step:last-child{border-bottom:none;}
+  .step input[type=checkbox]{
+    margin-top:3px;
+    width:16px;height:16px;
+    accent-color:var(--pass);
+    flex-shrink:0;
+    cursor:pointer;
+  }
+  .step label{cursor:pointer;}
+  .step.checked label{color:var(--ink-faint);text-decoration:line-through;}
+  .resources{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .resources i{color:var(--ink-faint);}
+  textarea.notes{
+    width:100%;
+    min-height:56px;
+    resize:vertical;
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:8px 10px;
+    font-family:var(--body);
+    font-size:13.5px;
+    color:var(--ink);
+    background:#fbfbfa;
+  }
+  textarea.notes:focus{outline:2px solid var(--accent-soft);border-color:var(--accent);}
+
+  /* ---------- Footer ---------- */
+  .footer{
+    margin-top:48px;
+    background:var(--accent-soft);
+    border:1px solid #cfe0ee;
+    border-radius:10px;
+    padding:20px 22px;
+  }
+  .footer h3{
+    font-family:var(--display);
+    font-size:15px;
+    margin:0 0 8px 0;
+  }
+  .footer p{font-size:13.5px;color:var(--ink-soft);margin:0 0 8px 0;}
+  .footer p:last-child{margin-bottom:0;}
+  .save-note{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--ink-faint);
+    text-align:center;
+    margin-top:18px;
+  }
+
+  @media (max-width:600px){
+    h1{font-size:26px;}
+    .case-title{max-width:150px;}
+    .runstat{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+
+<div class="runbar">
+  <div class="wrap">
+    <p class="eyebrow">Individual Development Plan · Test Suite IDP-2026</p>
+    <h1>Mariia Prokopovych — QA Engineer</h1>
+    <p class="sub">Lead: Tetiana Kornyk · Review cadence: check-ins as needed, full re-assessment in 12 months</p>
+    <div class="meta-row">
+      <span>CURRENT LEVEL: <b>Junior 3</b></span>
+      <span>TARGET LEVEL: <b>Middle 1</b></span>
+      <span>LAST SCORE: <b>29.5 / 75 (39.3%)</b></span>
+      <span>NEXT ASSESSMENT: <b id="reviewDate">November 2027</b></span>
+    </div>
+    <div class="runstat">
+      <div class="pct" id="overallPct">0%</div>
+      <div class="bar-track"><div class="bar-fill" id="overallBar"></div></div>
+      <div class="label" id="overallLabel">0 / 0 steps passed</div>
+    </div>
+    <p class="target-note">Goal: close the gap between <b>29.5</b> and the <b>35-pt</b> threshold for Middle 1 by working through the 11 test cases below over the next <b>12 months</b>.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ================= PHASE 1 ================= -->
+  <div class="phase" data-phase="p1">
+    <div class="phase-head">
+      <div class="phase-title"><span class="phase-tag">Phase 1</span> The base under everyday work</div>
+      <div class="phase-dates">Months 1–4</div>
+    </div>
+    <div class="phase-progress" style="margin-bottom:16px;">
+      <span>Phase progress</span>
+      <div class="mini-track"><div class="mini-fill" data-qfill="p1"></div></div>
+      <span data-qlabel="p1">0%</span>
+    </div>
+    <p class="phase-blurb">Four areas you already work with daily but can't yet name precisely — the network underneath every request, the storage layer behind every login bug, the process you run correctly without the vocabulary for it, and the techniques you apply by instinct. None of these depend on a project giving you anything, which is why they come first.</p>
+
+    <div class="case" data-case="QA-IDP-01">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-01</span>
+          <span class="case-title">Networks &amp; Protocols</span>
+          <span class="priority high">High</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">The lowest-scoring area on the whole rubric at 1.25 / 5, and the widest distance between what you use every day and what you can name. HTTP and HTTPS came out confidently, and the idea of an IP address was essentially right — packets delivered to a specific address. TCP, DNS and the network layers were honest "I don't know"s, which is exactly the right answer and the reason this case sits first. None of it waits on a project: it can be learned on any application you already test.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>Client–server, properly: what a server is, and why a browser, a mobile app, a desktop app or another API can all be the client. You described the request/response road between them well — this builds on that</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>HTTP vs HTTPS: what the S actually adds (TLS encryption of data in transit) and what that changes for a tester intercepting traffic</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>TCP: splits data into numbered segments, guarantees order and delivery, reassembles on arrival. Write your own one-sentence definition, plus one line on UDP and why video calls prefer it</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>IP: how an address gets a packet to the right device, and IPv4 vs IPv6 in one line each</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>DNS: the system that turns a domain name into an IP address. Clear your DNS cache once and watch a page resolve from scratch</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>Network layers: the seven OSI layers by name with one example each, then the four most testers actually use — application, transport, network, link — and which layer your bugs usually live on</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>Status codes end to end: the five groups with three codes each (200/201/204 · 301/302/304 · 400/401/403/404 · 500/502/503) and who is at fault in each case</label></li>
+            <li class="step"><input type="checkbox" data-step="7"><label>Explain to a colleague, in two minutes, everything that happens between typing a URL and seeing the page — DNS, TCP, TLS, request, response</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">Defines TCP, IP, DNS, HTTP/HTTPS and the network layers in own words without prompting. Names all five status code groups with examples, and can say whether a given 4xx belongs to the user, the client app or the back end.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> MDN HTTP docs · Cloudflare Learning Center (DNS, TLS, CDN) · howdns.works</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="case" data-case="QA-IDP-02">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-02</span>
+          <span class="case-title">Web Internals &amp; DevTools Depth</span>
+          <span class="priority medium">Medium</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">DevTools is a real strength — Network to back up bug reports, Inspect against Figma for UI checks, device mode for screen sizes, Console for errors. Client-server architecture and the one/two/three/multi-tier breakdown were good answers. What sits underneath is less settled: cache, cookies, session and local/session storage ran together into one answer, and that's the layer most login, logout and "it still shows the old data" bugs come from. Web applications scored 2.17 / 5.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>Cache lives on the client, in the browser: what it stores, why, and exactly what goes wrong when it is stale. Write one bug you could file against it</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>Cookies: what they hold (settings, a session identifier), who sets them, when they expire. Find them in DevTools → Application and read one real cookie</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Session: state held on the server and identified by that cookie. Why closing a tab sometimes logs you out and sometimes doesn't</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>localStorage vs sessionStorage: where each lives, what survives a tab close, what survives a browser restart</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>Authentication vs authorization: two bugs from your own projects, one for each. You already check tokens in headers — name which of the two that is</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>DevTools panels you don't use yet: Performance, Application → Storage, Lighthouse, and network throttling to simulate 3G on a web flow</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>iframe and JavaScript: what an iframe is, why a page embeds one, what it breaks for a tester (focus, scrolling, cross-origin), and what a Console error tells you about where a bug sits</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">States without hesitation that cache is client-side, separates cookies from session and from storage, and explains authentication vs authorization with own examples. Reaches past the Network panel to whichever DevTools panel fits the question.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> MDN — HTTP caching, Cookies, Web Storage API · Chrome DevTools official docs</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="case" data-case="QA-IDP-03">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-03</span>
+          <span class="case-title">STLC, SDLC &amp; Agile Vocabulary</span>
+          <span class="priority high">High</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">You run this process correctly every day; what's missing is the vocabulary for it, which is why this is the cheapest set of points on the whole plan. The STLC phases came out in the wrong order and implementation vs execution needed a hint — though once prompted you described implementation precisely: environments, test data, builds. The SDLC half was good: Waterfall, V-model and Incremental named, Agile correctly placed as a flexible approach rather than a model, and the V-model self-corrected after starting on Waterfall. The one clear gap is Scrum vs Kanban — the answer described a board, which both of them have. The real difference is sprints and ceremonies. Testing fundamentals scored 2.5 / 5 and methodologies 2.25 / 5.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>Write the seven STLC phases in order from memory — Planning → Monitoring &amp; Control → Analysis → Design → Implementation → Execution → Closure — and against each one, a line on what you personally do at that point on a short project</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>Nail the three that got mixed up: Design = writing the cases · Implementation = environments, test data, builds, suites · Execution = running what you prepared</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Test closure, the phase that gets skipped: test summary report, metrics, lessons learned, archiving the artefacts. You already produce a test report — name the phase it belongs to</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>Scrum: fixed-length sprints plus the four mandatory ceremonies — planning, daily, review/demo, retrospective. These are the flags you spot in the first week</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>Kanban: continuous flow, no sprints, no mandatory ceremonies, WIP limits, pull instead of commitment. A board alone proves nothing — both use one</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>Roles and what each one owes QA: PM, Product Owner, BA, Team Lead vs Tech Lead, developer</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>Explain the full STLC to Tetiana in under five minutes, using one of your own projects as the running example</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">Names the seven STLC phases in order and places implementation, execution and closure correctly. States the Scrum vs Kanban difference as sprints and ceremonies, unprompted, and can classify a project from its first week on the evidence.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> ISTQB Foundation Level syllabus, chapters 1–2 · scrumguides.org · Atlassian Agile Coach — Kanban vs Scrum</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="case" data-case="QA-IDP-04">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-04</span>
+          <span class="case-title">Test Levels, Types &amp; Test Design</span>
+          <span class="priority high">High</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">Security testing was the standout answer of the whole interview — access by role, tokens in headers, OWASP, SQL injection — well above what this level asks for. Test levels were nearly complete: integration, system and acceptance named, with unit missing at first and some uncertainty about who owns unit and component testing. Ad-hoc and exploratory ran together, and the line between them is technique. On test design you use exploratory constantly and like state transition, and you built a decision table once on a training project — so the step now is using the techniques deliberately on real features rather than by instinct. Test types scored 2.33 / 5 and test documentation 2.5 / 5.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>Integration testing in its two flavours: between components of one system, and between systems (your app ↔ a third-party API)</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>Ad-hoc vs exploratory: ad-hoc is free-form and anyone can do it; exploratory is a disciplined session — charter, techniques, notes, a time box — and only a tester who holds those techniques can run it</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Run one exploratory session the formal way: a written charter, 60 minutes, notes as you go, a checklist produced at the end. Compare it with how you work today</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>Equivalence partitioning and boundary value analysis on one real input field: write the partitions and the boundaries down <i>before</i> writing a single case</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>Decision table on one real feature with two or more conditions — you've built one before, this is about repeating it where it pays off</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>State transition on a flow that has states (login/session, booking, order status): draw the diagram, derive the cases from it</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>Traceability matrix: requirements down one axis, test cases across the other, filled cells showing coverage. Build a small one for a single feature and use it to find what isn't covered</label></li>
+            <li class="step"><input type="checkbox" data-step="7"><label>From now on, for each feature write one line on which technique you chose and why, before you start designing cases</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">States the ad-hoc vs exploratory difference in terms of technique, and has applied equivalence partitioning, boundary values, a decision table and state transition on real features — each with a stated reason for the choice.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> ISTQB Foundation Level, chapters 2 and 4 · exploratory testing charters (James Bach / Michael Bolton)</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PHASE 2 ================= -->
+  <div class="phase" data-phase="p2">
+    <div class="phase-head">
+      <div class="phase-title"><span class="phase-tag">Phase 2</span> Technical depth — traffic, APIs and data</div>
+      <div class="phase-dates">Months 5–8</div>
+    </div>
+    <div class="phase-progress" style="margin-bottom:16px;">
+      <span>Phase progress</span>
+      <div class="mini-track"><div class="mini-fill" data-qfill="p2"></div></div>
+      <span data-qlabel="p2">0%</span>
+    </div>
+    <p class="phase-blurb">The three growth zones you named yourself — Proxyman, API testing and SQL — plus the structure behind the non-functional testing you already do. This is the phase that changes what your bug reports can say: not "the screen shows the wrong total", but "the response contained the wrong total, here it is".</p>
+
+    <div class="case" data-case="QA-IDP-05">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-05</span>
+          <span class="case-title">Proxyman &amp; Mobile Tooling</span>
+          <span class="priority high">High</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">Your own first goal for this period, and it is the right one. You've installed Proxyman, understood exactly what it's for — intercepting traffic between the app and the back end — captured one request, and hit the usual wall around the desktop app and certificate setup. Android Studio has been used once, to try to reproduce a bug reported from a device you don't have; ADB and Xcode haven't been touched yet. These are the tools that turn "the app shows the wrong thing" into "the response contained the wrong thing" — the single biggest step up in bug report quality available to you right now. Traffic debugging scored 1.5 / 5 and the mobile tooling sub-area 1.5 / 5.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>Finish the Proxyman setup properly: desktop app running, certificate installed and trusted on the device, HTTPS traffic readable end to end rather than one request at a time</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>Capture one complete user flow on a mobile project and read every request in it — endpoint, headers, body, status, response time</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Map Local: replace one response with your own file and watch how the app behaves with empty, huge or malformed data. This is how you test error states without asking a developer for anything</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>Throttling: simulate a slow network on one flow and note what the UI does while it waits — spinners, timeouts, double submissions</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>Breakpoints: intercept one request before it reaches the server, change a value, let it through. Write down one bug this could have caught</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>Attach a captured request/response pair to a real bug report instead of describing it in words</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>Android Studio: create an AVD, install a build on it, reproduce one existing bug</label></li>
+            <li class="step"><input type="checkbox" data-step="7"><label>ADB: <i>adb devices</i>, <i>adb install</i>, and <i>adb logcat</i> filtered to your app. Capture a log while reproducing a crash and attach it to a ticket</label></li>
+            <li class="step"><input type="checkbox" data-step="8"><label>Xcode: launch an iOS simulator, install a build, open the device log for it</label></li>
+            <li class="step"><input type="checkbox" data-step="9"><label>Write the emulator vs simulator difference in your own words — an emulator reproduces the device's hardware and software (Android Studio), a simulator only imitates its behaviour (iOS Simulator) — plus the list of what neither can test: camera, biometrics, battery, real network, true performance</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">Uses Proxyman on mobile projects as routine, including Map Local and breakpoints, and attaches captured traffic to bug reports. Runs builds on an AVD and an iOS simulator, pulls a log with ADB, and states the emulator vs simulator difference unprompted.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> Proxyman docs — HTTPS setup, Map Local, Breakpoints · Android Developers — AVD and ADB · Apple Simulator documentation</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="case" data-case="QA-IDP-06">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-06</span>
+          <span class="case-title">API Testing Depth</span>
+          <span class="priority high">High</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">The strongest progress of the whole review. A 63-request Postman collection, environments for two separate configurations, a token picked up automatically after sign-in, and a test report built from the run — that is above what this level asks for, and developers now send you the server link and the documentation without being asked. The reasoning behind it was right too: faster than the UI, deeper validation, reusable for load. Two things are missing — the difference between an API and a web service, which didn't get answered, and the step from "the collection runs" to "the collection asserts". Section score 2.0 / 5, and this is where your momentum already is.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>API vs web service: every web service is an API, not every API is a web service — a web service is always exposed over a network, an API can be local to a program. Write both definitions in your own words</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>REST vs SOAP vs GraphQL, one paragraph each: an architectural style over HTTP with JSON · a protocol with XML and a strict contract · a single endpoint where the client asks for exactly the fields it wants</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Request anatomy end to end — method, URL, path vs query parameters, headers, body, auth — and response anatomy: status, headers, body, time</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>Auth types and how to set each in Postman: none, basic, API key, bearer token, OAuth 2.0</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>Add assertions to an existing collection: status code, response time, a field's presence and type, a returned value matching what you sent</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>Negative cases on one endpoint: missing required field, wrong type, empty body, oversized value, invalid token, expired token. Check that both the status code and the error message make sense</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>Chain two requests so the second uses an id returned by the first</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">Explains API vs web service, and REST vs SOAP vs GraphQL, without prompting. Owns a Postman collection that asserts rather than just runs, covers negative cases and chains requests.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> Postman Learning Center — tests, variables, collection runner · the Swagger documentation on your own projects · reqres.in for practice</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="case" data-case="QA-IDP-07">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-07</span>
+          <span class="case-title">Databases &amp; SQL</span>
+          <span class="priority medium">Medium</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">The theory is in better shape than the score suggests. Relational vs non-relational came out well, with a real example of why a social feed needs the non-relational shape, and primary key was close — a unique, non-null column the rest of the row depends on. What's missing is hands on a keyboard: you've written no SQL yet, and your projects haven't given you database access. That's exactly why this case is built to need none — every step below runs in a browser sandbox on a sample database. Section score 1.5 / 5.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>What a database gives QA that the UI never will: what was actually stored, in what format, and what a failed request left behind</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>Relational vs non-relational with the engines you'll actually meet: PostgreSQL, MySQL, MS SQL, SQLite · MongoDB, Redis</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Primary key vs foreign key vs unique constraint vs index — one line each</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>SELECT with WHERE, ORDER BY and LIMIT: write ten by hand on sqlbolt.com, which brings its own sample database — nothing to install, no access to request</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>COUNT, SUM, AVG with GROUP BY — the queries that answer "how many of these are there really"</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>INNER JOIN vs LEFT JOIN: a diagram plus a plain-words explanation, then three joined queries on the sandbox</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>INSERT, UPDATE and DELETE: what they do, and why a tester runs them only on a test database and never without a WHERE clause</label></li>
+            <li class="step"><input type="checkbox" data-step="7"><label>GraphQL in practice: run three queries on a public playground and see the "ask for exactly these fields" behaviour yourself</label></li>
+            <li class="step"><input type="checkbox" data-step="8"><label>If a project ever offers read-only database access, ask for it — and bring one data check you would run on day one</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">Writes a SELECT with filtering, sorting and aggregation without help, explains INNER vs LEFT JOIN, and names what she would verify in a database that the UI cannot show. None of it waits on project access — and if access appears, the base is ready to use it.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> sqlbolt.com (browser-based, own sample database) · sql-practice.com · a public GraphQL playground such as countries.trevorblades.com</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="case" data-case="QA-IDP-08">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-08</span>
+          <span class="case-title">Non-functional Testing, Structured</span>
+          <span class="priority medium">Medium</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">You test far more of this than you can list. The timezone root cause you found in a UK-based app is a textbook localization find, and compatibility across operating systems, devices and browsers is daily work. The gap is recall and structure: the first answer named three types, and the rest only came out with hints. Load vs stress was right; the other performance types didn't come up, and usability stopped at UI checks against Figma. This case names what you already do, so you can plan it deliberately instead of covering it by habit. Section score 1.75 / 5.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>The performance family precisely: load = within expected limits · stress = at and beyond the limit · volume = large amounts of data · scalability = behaviour as capacity grows · endurance = behaviour over a long run</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>Compatibility — all seven dimensions: operating systems, browsers, devices, hardware, network types (WiFi / LTE / 3G / offline), versions (app and OS), databases. You named three; the other four are where the surprises hide</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Build a compatibility matrix for one current project: what you cover today, what you don't, and what the risk of not covering it is</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>Version compatibility specifically: run one flow on an older app version and an older OS version</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>Usability heuristics — Nielsen's ten — and one pass over a single screen against them. This is the level above "the spacing doesn't match Figma"</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>Accessibility basics: contrast, tap target size, text scaling, screen reader labels. Run one screen through a contrast checker</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>Localization beyond language: currency, date and time formats, timezone, text expansion, right-to-left layouts. Add your timezone find as the worked example</label></li>
+            <li class="step"><input type="checkbox" data-step="7"><label>Performance, hands-on and small: take one existing Postman collection, run it with increasing iterations in Newman, and record how response times move</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">Distinguishes load, stress and volume, names all seven compatibility dimensions without prompting, and has produced a compatibility matrix plus one heuristics pass on a real project.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> ISTQB Foundation Level, chapter 2 · NN/g — 10 Usability Heuristics · WebAIM contrast checker</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PHASE 3 ================= -->
+  <div class="phase" data-phase="p3">
+    <div class="phase-head">
+      <div class="phase-title"><span class="phase-tag">Phase 3</span> Risk, ownership &amp; review prep</div>
+      <div class="phase-dates">Months 9–12</div>
+    </div>
+    <div class="phase-progress" style="margin-bottom:16px;">
+      <span>Phase progress</span>
+      <div class="mini-track"><div class="mini-fill" data-qfill="p3"></div></div>
+      <span data-qlabel="p3">0%</span>
+    </div>
+    <p class="phase-blurb">What separates a strong Junior from a Middle isn't more knowledge — it's making decisions visible and making your work usable by other people. Risk and release readiness come first because they fit short projects exactly; sharing your work with the team follows; the dry-run makes sure nothing in the next review is a surprise.</p>
+
+    <div class="case" data-case="QA-IDP-09">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-09</span>
+          <span class="case-title">Risk-based Testing, Estimation &amp; Release Readiness</span>
+          <span class="priority high">High</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">The most valuable case on this plan for the work you actually do. On short projects with little testing time you already prioritise by risk instinctively — critical flows first, device coverage cut back to the popular sizes when the deadline arrives — and your estimation vocabulary is good for the level: three-point, planning poker, T-shirt sizing, analogous and expert estimation, timeboxing. What's missing is the formal layer. Impact Analysis didn't come up at all, and on exit criteria the answer stopped at "all cases passed, deadline reached, too many bugs" and needed a hint to connect with acceptance criteria, Definition of Done and the test plan. Writing these down is what lets you defend a scope decision rather than only make it. Section score 1.75 / 5.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>Impact Analysis: what changed, what it touches, and which flows beyond the changed component need retesting. Asking the developer which modules a change reaches <i>is</i> the technique — you already had that instinct</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>Run one on your next feature before scoping regression: list the affected areas, then the cases you will run and the ones you will skip because of it</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Risk = likelihood × impact. Score five areas of one project on both, sort them, and treat that order as your written test priority</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>Put the risk list into the ticket or the test report, so the decision is visible to the PM and not only in your head</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>Acceptance criteria as the primary exit condition for a story, Definition of Done as the team's checklist, the test plan as where testing's own goals and exit criteria live. One line on how the three relate</label></li>
+            <li class="step"><input type="checkbox" data-step="5"><label>Draft exit criteria for one short project in five bullets — what has to be true before you say testing is done</label></li>
+            <li class="step"><input type="checkbox" data-step="6"><label>The estimation techniques you didn't have: top-down (split a fixed total across tasks), bottom-up (estimate tasks, then sum), parametric (scale from a comparable past project), what-if (model best and worst scenarios)</label></li>
+            <li class="step"><input type="checkbox" data-step="7"><label>Estimate your next three tasks bottom-up, write the estimate down, and compare it with the actuals afterwards</label></li>
+            <li class="step"><input type="checkbox" data-step="8"><label>Release readiness: a one-page checklist of what you want true before a build ships — blockers, open high-severity defects, smoke run on the target devices, known issues documented</label></li>
+            <li class="step"><input type="checkbox" data-step="9"><label>UAT, alpha and beta: UAT is the final acceptance layer run by the client or product owner against the requirements; alpha runs internally; beta runs with real users in the real environment</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">Runs a written Impact Analysis before scoping regression, produces a ranked risk list the PM can see, defines exit criteria in terms of acceptance criteria, Definition of Done and the test plan, and names the full set of estimation techniques — using bottom-up on real tasks and checking it against actuals.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> ISTQB Foundation Level, chapter 5 — test management and risk · your own test plan and test report as the starting templates</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="case" data-case="QA-IDP-10">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-10</span>
+          <span class="case-title">Sharing With the QA Team</span>
+          <span class="priority medium">Medium</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">The Postman collection with environments and the token captured after sign-in is exactly the kind of thing other people on the team are about to need — and you built it partly because a colleague pushed you towards it. Turning it into something reusable is both the fastest way to consolidate your own knowledge and the clearest Middle-level signal there is: at that level the work stops being only yours. Risk awareness and proactivity scored 3.0 / 5, the single highest mark in the review, so this case builds on a strength rather than patching a gap.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>Write a short how-to for your Postman setup: environments, variables, capturing the token after sign-in, how to point it at a new project. One page, enough for someone else to copy without asking you</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>Turn one collection into a template a colleague could fork at the start of a new short project</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>Run a knowledge-sharing session for the QA team on API testing with Postman — your own screenshots, one live run</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>Collect the questions people asked and write down the ones you couldn't answer — those are your next learning items, chosen by the team rather than by a syllabus</label></li>
+            <li class="step"><input type="checkbox" data-step="4"><label>Offer the same for Proxyman once QA-IDP-05 is done, if the team finds it useful</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">A written, reusable Postman setup the team can pick up on their own, and at least one session delivered to the QA team.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> your existing collections and test reports · the QA team's knowledge-sharing sessions</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="case" data-case="QA-IDP-11">
+      <div class="case-head">
+        <div class="case-head-left">
+          <span class="case-id">QA-IDP-11</span>
+          <span class="case-title">Mock Assessment Dry-Run</span>
+          <span class="priority high">High</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge todo" data-status="">NOT STARTED</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+      <div class="case-body">
+        <div class="field">
+          <div class="field-label">Starting point</div>
+          <div class="precondition">November 2026 scored 29.5 / 75 (39.3%) and confirmed Junior 3; Middle 1 sits at 35 / 75, so the plan above needs to be worth around six points. The one thing worth attention before the next review is the distance between your own scoring and the lead's — 44.2 against 29.5, widest in processes and methodologies, test management, networks and mobile tooling. That gap isn't a problem in itself; closing it means walking into the next review knowing what the rubric measures and able to back a score with an example rather than a definition.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Steps to learn</div>
+          <ul class="steps">
+            <li class="step"><input type="checkbox" data-step="0"><label>Re-score yourself honestly against all 15 areas without looking at the November form, then compare with both the self and the lead columns</label></li>
+            <li class="step"><input type="checkbox" data-step="1"><label>For every area where November's self-score sat 1.5 points or more above the lead's, write what evidence would have justified your number — and whether you have that evidence now</label></li>
+            <li class="step"><input type="checkbox" data-step="2"><label>For every sub-area still below 2, write one concrete example from the past year instead of a definition</label></li>
+            <li class="step"><input type="checkbox" data-step="3"><label>Run a 45-minute mock interview with your lead on the areas that scored lowest: networks, test management and non-functional testing</label></li>
+          </ul>
+        </div>
+        <div class="field">
+          <div class="field-label">Expected result</div>
+          <div class="expected">Self-assessment lands within ±3 points of the lead's, with a projected total at or above 35 / 75 — the Middle 1 threshold.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Resources</div>
+          <div class="resources"><i>Suggested:</i> the QA Performance Review form (15 areas) · your notes from the ten cases above</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes / progress log</div>
+          <textarea class="notes" placeholder="Jot down questions, links you found useful, or what clicked..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <h3>How to use this plan</h3>
+    <p>Work roughly one phase at a time, but feel free to move faster on anything that clicks quickly. Check off each step as you complete it — a test case flips to <b>PASS</b> once every step inside it is checked.</p>
+    <p>Your progress is saved automatically in this document, so you can close it and come back anytime over the next 12 months.</p>
+    <p>Reach out to Tetiana (QA Lead) whenever you need help or want to talk something through. Full re-assessment against the same rubric happens in 12 months.</p>
+  </div>
+
+  <p class="save-note" id="saveNote">Starting a fresh plan — progress will be saved automatically from now on.</p>
+
+</div>
+
+<script>
+(function(){
+  const CASES = {
+    "QA-IDP-01": 8, "QA-IDP-02": 7, "QA-IDP-03": 7, "QA-IDP-04": 8,
+    "QA-IDP-05": 10, "QA-IDP-06": 7, "QA-IDP-07": 9, "QA-IDP-08": 8,
+    "QA-IDP-09": 10, "QA-IDP-10": 5, "QA-IDP-11": 4
+  };
+  const PHASE_CASES = {
+    p1: ["QA-IDP-01","QA-IDP-02","QA-IDP-03","QA-IDP-04"],
+    p2: ["QA-IDP-05","QA-IDP-06","QA-IDP-07","QA-IDP-08"],
+    p3: ["QA-IDP-09","QA-IDP-10","QA-IDP-11"]
+  };
+  const STORAGE_KEY = "idp-mariia-2026-progress";
+
+  let state = {};
+  Object.keys(CASES).forEach(id => {
+    state[id] = { steps: new Array(CASES[id]).fill(false), notes: "" };
+  });
+
+  /* Works both as a hosted page (localStorage) and inside a document
+     host that provides window.storage. */
+  const store = {
+    async get(){
+      if (window.storage && typeof window.storage.get === 'function'){
+        const r = await window.storage.get(STORAGE_KEY, false);
+        return r && r.value ? r.value : null;
+      }
+      return localStorage.getItem(STORAGE_KEY);
+    },
+    async set(value){
+      if (window.storage && typeof window.storage.set === 'function'){
+        return window.storage.set(STORAGE_KEY, value, false);
+      }
+      localStorage.setItem(STORAGE_KEY, value);
+    }
+  };
+
+  function caseStatus(id){
+    const st = state[id];
+    const total = st.steps.length;
+    const done = st.steps.filter(Boolean).length;
+    if (done === 0) return 'todo';
+    if (done === total) return 'pass';
+    return 'progress';
+  }
+
+  function statusLabel(s){
+    if (s === 'pass') return 'PASS';
+    if (s === 'progress') return 'IN PROGRESS';
+    return 'NOT STARTED';
+  }
+
+  function render(){
+    Object.keys(CASES).forEach(id => {
+      const card = document.querySelector(`.case[data-case="${id}"]`);
+      if (!card) return;
+      const st = state[id];
+      card.querySelectorAll('.step').forEach((stepEl, i) => {
+        const cb = stepEl.querySelector('input[type=checkbox]');
+        cb.checked = !!st.steps[i];
+        stepEl.classList.toggle('checked', !!st.steps[i]);
+      });
+      const notesEl = card.querySelector('textarea.notes');
+      if (notesEl && notesEl.value !== st.notes) notesEl.value = st.notes;
+
+      const s = caseStatus(id);
+      const badge = card.querySelector('[data-status]');
+      badge.textContent = statusLabel(s);
+      badge.className = 'status-badge ' + s;
+    });
+    updateProgressBars();
+  }
+
+  function updateProgressBars(){
+    let totalSteps = 0, totalDone = 0;
+    Object.keys(CASES).forEach(id => {
+      totalSteps += state[id].steps.length;
+      totalDone += state[id].steps.filter(Boolean).length;
+    });
+    const pct = totalSteps ? Math.round((totalDone/totalSteps)*100) : 0;
+    document.getElementById('overallPct').textContent = pct + '%';
+    document.getElementById('overallBar').style.width = pct + '%';
+    document.getElementById('overallLabel').textContent = `${totalDone} / ${totalSteps} steps passed`;
+
+    Object.keys(PHASE_CASES).forEach(p => {
+      let pTotal = 0, pDone = 0;
+      PHASE_CASES[p].forEach(id => {
+        pTotal += state[id].steps.length;
+        pDone += state[id].steps.filter(Boolean).length;
+      });
+      const ppct = pTotal ? Math.round((pDone/pTotal)*100) : 0;
+      const fillEl = document.querySelector(`[data-qfill="${p}"]`);
+      const labelEl = document.querySelector(`[data-qlabel="${p}"]`);
+      if (fillEl) fillEl.style.width = ppct + '%';
+      if (labelEl) labelEl.textContent = ppct + '%';
+    });
+  }
+
+  let saveTimer = null;
+  function scheduleSave(){
+    const note = document.getElementById('saveNote');
+    note.textContent = 'Saving…';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try{
+        await store.set(JSON.stringify(state));
+        note.textContent = 'Progress saved · ' + new Date().toLocaleTimeString();
+      }catch(e){
+        note.textContent = 'Could not save progress — your changes may not persist after closing this document.';
+      }
+    }, 500);
+  }
+
+  async function loadState(){
+    const note = document.getElementById('saveNote');
+    try{
+      const raw = await store.get();
+      if (raw){
+        const saved = JSON.parse(raw);
+        Object.keys(CASES).forEach(id => {
+          if (saved[id]){
+            state[id].steps = (saved[id].steps || []).slice(0, CASES[id]);
+            while (state[id].steps.length < CASES[id]) state[id].steps.push(false);
+            state[id].notes = saved[id].notes || "";
+          }
+        });
+      }
+      note.textContent = 'Progress saved automatically in this document.';
+    }catch(e){
+      note.textContent = 'Starting a fresh plan — progress will be saved automatically from now on.';
+    }
+    render();
+  }
+
+  function bindEvents(){
+    document.querySelectorAll('.case-head').forEach(head => {
+      head.addEventListener('click', () => {
+        head.closest('.case').classList.toggle('open');
+      });
+    });
+
+    document.querySelectorAll('.case').forEach(card => {
+      const id = card.getAttribute('data-case');
+      card.querySelectorAll('.step input[type=checkbox]').forEach((cb, i) => {
+        cb.addEventListener('click', (e) => e.stopPropagation());
+        cb.addEventListener('change', () => {
+          state[id].steps[i] = cb.checked;
+          cb.closest('.step').classList.toggle('checked', cb.checked);
+          const s = caseStatus(id);
+          const badge = card.querySelector('[data-status]');
+          badge.textContent = statusLabel(s);
+          badge.className = 'status-badge ' + s;
+          updateProgressBars();
+          scheduleSave();
+        });
+      });
+      const notesEl = card.querySelector('textarea.notes');
+      if (notesEl){
+        notesEl.addEventListener('click', (e) => e.stopPropagation());
+        notesEl.addEventListener('input', () => {
+          state[id].notes = notesEl.value;
+          scheduleSave();
+        });
+      }
+    });
+
+    // open first case of each phase by default
+    document.querySelectorAll('.phase').forEach(p => {
+      const first = p.querySelector('.case');
+      if (first) first.classList.add('open');
+    });
+  }
+
+  bindEvents();
+  loadState();
+})();
+</script>
+
+</body>
+</html>
